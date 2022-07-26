@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>linkServer</artifactId>
+    <artifactId>vote-linkServer</artifactId>
     <dependencies>
 
     </dependencies>

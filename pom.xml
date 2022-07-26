@@ -8,11 +8,11 @@
     <artifactId>voteSystem</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>encryptionSystem</module>
-        <module>linkServer</module>
-        <module>webSystem</module>
-        <module>dispatch</module>
+        <module>vote-dispatch</module>
+        <module>vote-encryption</module>
+        <module>vote-linkServer</module>
         <module>vote-test</module>
+        <module>vote-webBack</module>
     </modules>
 
     <packaging>pom</packaging>
