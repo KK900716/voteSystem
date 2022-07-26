@@ -12,13 +12,14 @@
     </parent>
     <groupId>org.sics</groupId>
     <artifactId>voteSystem</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>${voteSystem.version}</version>
     <modules>
         <module>vote-dispatch</module>
         <module>vote-encryption</module>
         <module>vote-linkServer</module>
         <module>vote-test</module>
         <module>vote-webBack</module>
+        <module>vote-common</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -26,10 +27,8 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <voteSystem.version>1.0-SNAPSHOT</voteSystem.version>
     </properties>
-    <dependencyManagement>
-
-    </dependencyManagement>
     <build>
         <plugins>
             <plugin>

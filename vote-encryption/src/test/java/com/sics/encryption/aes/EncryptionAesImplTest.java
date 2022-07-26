@@ -13,21 +13,14 @@ import java.util.Objects;
 class EncryptionAesImplTest {
     @Resource
     private EncryptionAesImpl encryptionAes;
-
-    @BeforeEach
-    void setUp() {
-    }
-
-    @AfterEach
-    void tearDown() {
-    }
-
     @Test
     void testEncryptionAndDecryption() {
         String content = "defsadfasdfasdfsadfsadfasdfasfasfsadfsadfdsaf";
         String password = "1234567890123456";
         String encryption = encryptionAes.encode(content, password);
+        System.out.println(encryption);
         String decryption = encryptionAes.decode(encryption, password);
+        System.out.println(decryption);
         assert Objects.equals(decryption, content);
     }
 }
