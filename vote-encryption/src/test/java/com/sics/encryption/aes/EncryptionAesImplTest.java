@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 
 @SpringBootTest
@@ -23,11 +24,10 @@ class EncryptionAesImplTest {
 
     @Test
     void testEncryptionAndDecryption() {
-        String content = "我是一颗卤蛋";
-        String password = "我是密码";
-        byte[] ciphertext = encryptionAes.encryption(content, password);
-        String decryption = encryptionAes.decryption(ciphertext, password);
-        System.out.println(decryption);
-        // assert Objects.equals(decryption, content);
+        String content = "defsadfasdfasdfsadfsadfasdfasfasfsadfsadfdsaf";
+        String password = "1234567890123456";
+        String encryption = encryptionAes.encode(content, password);
+        String decryption = encryptionAes.decode(encryption, password);
+        assert Objects.equals(decryption, content);
     }
 }

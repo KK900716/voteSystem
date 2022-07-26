@@ -8,7 +8,7 @@ package com.sics.encryption;
 public abstract class AbstractEncryption {
     protected String content;
     protected String password;
-    protected byte[] ciphertext;
+    protected String ciphertext;
 
     /**
      * encryption
@@ -17,7 +17,7 @@ public abstract class AbstractEncryption {
      * @param password password
      * @return ciphertext
      */
-    public abstract byte[] encryption(String content, String password);
+    public abstract String encode(String content, String password);
     /**
      * decryption
      * @author liangjc
@@ -25,7 +25,7 @@ public abstract class AbstractEncryption {
      * @param password password
      * @return content
      */
-    public abstract String decryption(byte[] ciphertext, String password);
+    public abstract String decode(String ciphertext, String password);
 
     public String getContent() {
         return content;
@@ -43,7 +43,7 @@ public abstract class AbstractEncryption {
         this.password = password;
     }
 
-    public byte[] getCiphertext() {
+    public String getCiphertext() {
         return ciphertext;
     }
 }
