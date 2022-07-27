@@ -7,6 +7,7 @@ import com.sics.pojo.BasePojo;
 import com.sics.pojo.CiphertextAndPassword;
 import com.sics.pojo.EncryptionToDisPatch;
 import com.sics.pojo.WebBackToEncryption;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -53,7 +54,7 @@ public class ReturnMessageService {
      * @author liangjc
      * @param data 得分数据
      */
-    private boolean sendToDispatch(Map<String, Double> data){
+    protected boolean sendToDispatch(Map<String, Double> data){
         String json = JSON.toJSONString(data);
         String password = UUID.randomUUID().toString();
         String ciphertext = encryptionAes.encode(json, password);
