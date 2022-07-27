@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: vote-dispatch10002
+server:
+  port: 10002

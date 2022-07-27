@@ -13,7 +13,6 @@ import javax.crypto.spec.SecretKeySpec;
  * @author liangjc
  * @version 2022/07/26
  */
-@Component
 public class EncryptionAesImpl extends AbstractEncryption {
     private static final String ALGORITHM = "AES";
     private static final String TRANSFORMATION = "AES";

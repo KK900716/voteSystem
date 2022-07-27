@@ -7,6 +7,7 @@ import com.sics.pojo.BasePojo;
 import com.sics.pojo.CiphertextAndPassword;
 import com.sics.pojo.EncryptionToDisPatch;
 import com.sics.pojo.WebBackToEncryption;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import java.util.UUID;
  */
 @Service
 public class ReturnMessageService {
+    Logger logger = LoggerFactory.getLogger(ReturnMessageService.class);
     @Value("${url.sendToDispatch}")
     private String url;
     @Resource
@@ -37,13 +39,15 @@ public class ReturnMessageService {
      * @param webBackToEncryption Receive scoring data from WebBack
      * @return Return accepted status
      */
-    public BasePojo<CiphertextAndPassword> encode(WebBackToEncryption webBackToEncryption){
-        BasePojo<CiphertextAndPassword> returnBasePojo = new EncryptionToDisPatch();
-        boolean sendToDispatchJudge = sendToDispatch(webBackToEncryption.getData());
-        if (sendToDispatchJudge && Code.SUCCESS.getCode() == webBackToEncryption.getCode()){
-            returnBasePojo.setCode(Code.SUCCESS.getCode());
-            returnBasePojo.setMessage(Code.SUCCESS.getMessage());
-            return returnBasePojo;
+    public BasePojo<String> encode(WebBackToEncryption webBackToEncryption){
+        BasePojo<String> returnBasePojo = new BasePojo<>() {};
+        if (Code.SUCCESS.getCode() == webBackToEncryption.getCode()){
+            boolean sendToDispatchJudge = sendToDispatch(webBackToEncryption.getData());
+            if (sendToDispatchJudge){
+                returnBasePojo.setCode(Code.SUCCESS.getCode());
+                returnBasePojo.setMessage(Code.SUCCESS.getMessage());
+                return returnBasePojo;
+            }
         }
         returnBasePojo.setCode(Code.FAIL.getCode());
         returnBasePojo.setMessage(Code.FAIL.getMessage());
@@ -56,8 +60,15 @@ public class ReturnMessageService {
      */
     protected boolean sendToDispatch(Map<String, Double> data){
         String json = JSON.toJSONString(data);
-        String password = UUID.randomUUID().toString();
+        logger.info(json);
+        String uuid = UUID.randomUUID().toString();
+        System.out.println(uuid);
+        String password = uuid.substring(uuid.length()-17,uuid.length()-1);
+        logger.info(password);
         String ciphertext = encryptionAes.encode(json, password);
+        logger.info(ciphertext);
+        String decode = encryptionAes.decode(ciphertext, password);
+        logger.info(decode);
         CiphertextAndPassword ciphertextAndPassword = new CiphertextAndPassword();
         ciphertextAndPassword.setPassword(password);
         ciphertextAndPassword.setCiphertext(ciphertext);
@@ -65,7 +76,9 @@ public class ReturnMessageService {
         encryptionToDisPatch.setData(ciphertextAndPassword);
         encryptionToDisPatch.setCode(Code.SUCCESS.getCode());
         encryptionToDisPatch.setMessage(Code.SUCCESS.getMessage());
-        ResponseEntity<BasePojo> basePojoResponseEntity = restTemplate.postForEntity(url, encryptionToDisPatch, BasePojo.class);
+        // todo
+        ResponseEntity<EncryptionToDisPatch> basePojoResponseEntity = restTemplate.postForEntity(url, encryptionToDisPatch, EncryptionToDisPatch.class);
+        logger.info(Objects.requireNonNull(basePojoResponseEntity.getBody()).toString());
         return Objects.requireNonNull(basePojoResponseEntity.getBody()).getCode() == Code.SUCCESS.getCode();
     }
 }

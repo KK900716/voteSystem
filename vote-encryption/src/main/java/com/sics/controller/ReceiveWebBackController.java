@@ -20,7 +20,7 @@ public class ReceiveWebBackController {
     @Resource
     ReturnMessageService returnMessageService;
     @PostMapping("/encode")
-    public BasePojo<CiphertextAndPassword> encode(@RequestBody WebBackToEncryption webBackToEncryption){
+    public BasePojo<String> encode(@RequestBody WebBackToEncryption webBackToEncryption){
         return returnMessageService.encode(webBackToEncryption);
     }
 }

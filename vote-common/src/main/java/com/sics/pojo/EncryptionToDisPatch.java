@@ -1,7 +1,9 @@
 package com.sics.pojo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * 返回加密信息
@@ -9,7 +11,6 @@ import lombok.EqualsAndHashCode;
  * @version 2022/07/26
  */
 @EqualsAndHashCode(callSuper = true)
-@Data
 public class EncryptionToDisPatch extends BasePojo<CiphertextAndPassword>{
 
 }
