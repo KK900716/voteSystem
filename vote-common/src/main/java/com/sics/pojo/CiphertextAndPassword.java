@@ -9,7 +9,7 @@ import lombok.Data;
  * @version 2022~07~26~23:57
  */
 @Data
-public class Return {
+public class CiphertextAndPassword {
     private String ciphertext;
     private String password;
 }
