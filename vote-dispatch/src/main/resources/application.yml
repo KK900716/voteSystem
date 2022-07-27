@@ -3,3 +3,5 @@ spring:
     name: vote-dispatch10002
 server:
   port: 10002
+url:
+  sendToLinkServer: "http://127.0.0.1:10003/dispatch"

@@ -1,7 +1,6 @@
 package com.sics.controller;
 
-import com.sics.pojo.BasePojo;
-import com.sics.pojo.CiphertextAndPassword;
+import com.sics.pojo.BasePojoImpl;
 import com.sics.pojo.WebBackToEncryption;
 import com.sics.service.ReturnMessageService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +19,7 @@ public class ReceiveWebBackController {
     @Resource
     ReturnMessageService returnMessageService;
     @PostMapping("/encode")
-    public BasePojo<String> encode(@RequestBody WebBackToEncryption webBackToEncryption){
+    public BasePojoImpl encode(@RequestBody WebBackToEncryption webBackToEncryption){
         return returnMessageService.encode(webBackToEncryption);
     }
 }

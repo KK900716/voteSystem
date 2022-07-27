@@ -3,7 +3,7 @@ package com.sics.service;
 import com.alibaba.fastjson.JSON;
 import com.sics.code.Code;
 import com.sics.encryption.aes.EncryptionAesImpl;
-import com.sics.pojo.BasePojo;
+import com.sics.pojo.BasePojoImpl;
 import com.sics.pojo.CiphertextAndPassword;
 import com.sics.pojo.EncryptionToDisPatch;
 import com.sics.pojo.WebBackToEncryption;
@@ -27,8 +27,14 @@ import java.util.UUID;
 @Service
 public class ReturnMessageService {
     Logger logger = LoggerFactory.getLogger(ReturnMessageService.class);
+    /**
+     * The URL sent to the Dispatch module
+     */
     @Value("${url.sendToDispatch}")
     private String url;
+    /**
+     * Aes Encryption system
+     */
     @Resource
     private EncryptionAesImpl encryptionAes;
     @Resource
@@ -39,18 +45,22 @@ public class ReturnMessageService {
      * @param webBackToEncryption Receive scoring data from WebBack
      * @return Return accepted status
      */
-    public BasePojo<String> encode(WebBackToEncryption webBackToEncryption){
-        BasePojo<String> returnBasePojo = new BasePojo<>() {};
+    public BasePojoImpl encode(WebBackToEncryption webBackToEncryption){
+        // new return message
+        BasePojoImpl returnBasePojo = new BasePojoImpl();
+        // Determine whether acceptance is successful
         if (Code.SUCCESS.getCode() == webBackToEncryption.getCode()){
-            boolean sendToDispatchJudge = sendToDispatch(webBackToEncryption.getData());
-            if (sendToDispatchJudge){
+            // Send information to the Dispatch module
+            if (sendToDispatch(webBackToEncryption.getData())){
                 returnBasePojo.setCode(Code.SUCCESS.getCode());
                 returnBasePojo.setMessage(Code.SUCCESS.getMessage());
                 return returnBasePojo;
             }
         }
+        // Otherwise, return failure.
         returnBasePojo.setCode(Code.FAIL.getCode());
         returnBasePojo.setMessage(Code.FAIL.getMessage());
+        logger.error("webBackToEncryption error！");
         return returnBasePojo;
     }
     /**
@@ -59,26 +69,26 @@ public class ReturnMessageService {
      * @param data 得分数据
      */
     protected boolean sendToDispatch(Map<String, Double> data){
+        // Convert the data into a JSON string
         String json = JSON.toJSONString(data);
-        logger.info(json);
+        // Random key generation
         String uuid = UUID.randomUUID().toString();
-        System.out.println(uuid);
         String password = uuid.substring(uuid.length()-17,uuid.length()-1);
-        logger.info(password);
+        // Obtain ciphertext
         String ciphertext = encryptionAes.encode(json, password);
-        logger.info(ciphertext);
-        String decode = encryptionAes.decode(ciphertext, password);
-        logger.info(decode);
+        logger.info("uses the AES encryption algorithm");
+        // Encapsulating an entity class
         CiphertextAndPassword ciphertextAndPassword = new CiphertextAndPassword();
+        EncryptionToDisPatch encryptionToDisPatch = new EncryptionToDisPatch();
         ciphertextAndPassword.setPassword(password);
         ciphertextAndPassword.setCiphertext(ciphertext);
-        EncryptionToDisPatch encryptionToDisPatch = new EncryptionToDisPatch();
         encryptionToDisPatch.setData(ciphertextAndPassword);
         encryptionToDisPatch.setCode(Code.SUCCESS.getCode());
         encryptionToDisPatch.setMessage(Code.SUCCESS.getMessage());
-        // todo
-        ResponseEntity<EncryptionToDisPatch> basePojoResponseEntity = restTemplate.postForEntity(url, encryptionToDisPatch, EncryptionToDisPatch.class);
-        logger.info(Objects.requireNonNull(basePojoResponseEntity.getBody()).toString());
+        // send ciphertext and password dispatch
+        ResponseEntity<BasePojoImpl> basePojoResponseEntity =
+                restTemplate.postForEntity(url, encryptionToDisPatch, BasePojoImpl.class);
+        logger.info("send ciphertext and password dispatch");
         return Objects.requireNonNull(basePojoResponseEntity.getBody()).getCode() == Code.SUCCESS.getCode();
     }
 }
