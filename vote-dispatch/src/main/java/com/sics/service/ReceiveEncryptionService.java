@@ -1,9 +1,8 @@
 package com.sics.service;
 
-import com.sics.code.Code;
-import com.sics.pojo.BasePojoImpl;
-import com.sics.pojo.EncryptionToDisPatch;
-import com.sics.pojo.LinkServerToDisPatch;
+import com.sics.constant.enums.CiphertextOrPasswordType;
+import com.sics.constant.enums.Code;
+import com.sics.pojo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +25,8 @@ public class ReceiveEncryptionService {
     Logger logger = LoggerFactory.getLogger(ReceiveEncryptionService.class);
     @Value("${url.sendToLinkServer}")
     String sendToLinkServerUrl;
+    @Value("${server.port}")
+    String dispatchPort;
     @Resource
     RestTemplate restTemplate;
     /**
@@ -62,6 +63,7 @@ public class ReceiveEncryptionService {
         ResponseEntity<LinkServerToDisPatch> linkServerToDisPatchResponseEntity =
                 restTemplate.postForEntity(sendToLinkServerUrl, basePojo, LinkServerToDisPatch.class);
         if (Objects.requireNonNull(linkServerToDisPatchResponseEntity.getBody()).getCode() != Code.SUCCESS.getCode()){
+            logger.error("DisPatchToLinkServer error！");
             return false;
         }
         // Get the ids of all users
@@ -73,7 +75,33 @@ public class ReceiveEncryptionService {
             secondDispatchIp = (int)(Math.random() * userUrlMap.size());
         }
         // dispatch
-        // todo
-        return false;
+        // Building the Entity class
+        CiphertextOrPassword firstCiphertextOrPassword = new CiphertextOrPassword();
+        CiphertextOrPassword secondCiphertextOrPassword = new CiphertextOrPassword();
+        firstCiphertextOrPassword.setType(CiphertextOrPasswordType.CIPHERTEXT);
+        firstCiphertextOrPassword.setValue(encryptionToDisPatch.getData().getCiphertext());
+        DisPatchToOtherDisPatch firstDisPatchToOtherDisPatch = new DisPatchToOtherDisPatch();
+        firstDisPatchToOtherDisPatch.setCode(Code.SUCCESS.getCode());
+        firstDisPatchToOtherDisPatch.setMessage(Code.SUCCESS.getMessage());
+        firstDisPatchToOtherDisPatch.setData(firstCiphertextOrPassword);
+        secondCiphertextOrPassword.setType(CiphertextOrPasswordType.PASSWORD);
+        secondCiphertextOrPassword.setValue(encryptionToDisPatch.getData().getPassword());
+        DisPatchToOtherDisPatch secondDisPatchToOtherDisPatch = new DisPatchToOtherDisPatch();
+        firstDisPatchToOtherDisPatch.setCode(Code.SUCCESS.getCode());
+        firstDisPatchToOtherDisPatch.setMessage(Code.SUCCESS.getMessage());
+        firstDisPatchToOtherDisPatch.setData(secondCiphertextOrPassword);
+        // Send to other dispatches
+        ResponseEntity<BasePojoImpl> firstDisPatchResponse = restTemplate.postForEntity(
+                "http://" + userUrlMap.get(firstDispatchIp)+ dispatchPort + "/link-server",
+                firstDisPatchToOtherDisPatch, BasePojoImpl.class);
+        ResponseEntity<BasePojoImpl> secondDisPatchResponse = restTemplate.postForEntity(
+                "http://" + userUrlMap.get(firstDispatchIp)+ dispatchPort + "/link-server",
+                secondDisPatchToOtherDisPatch, BasePojoImpl.class);
+        boolean whetherSuccess =  Objects.requireNonNull(firstDisPatchResponse.getBody()).getCode() == Code.SUCCESS.getCode() &&
+                Objects.requireNonNull(secondDisPatchResponse.getBody()).getCode() == Code.SUCCESS.getCode();
+        if (!whetherSuccess){
+            logger.error("DisPatchToDisPatch error！");
+        }
+        return whetherSuccess;
     }
 }
