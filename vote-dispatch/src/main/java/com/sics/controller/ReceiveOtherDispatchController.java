@@ -19,7 +19,7 @@ import javax.annotation.Resource;
 public class ReceiveOtherDispatchController {
     @Resource
     ReceiveOtherDispatchService receiveOtherDispatchService;
-    @PostMapping("link-server")
+    @PostMapping("/dispatch/cipher-or-password")
     public BasePojoImpl linkServer(@RequestBody DisPatchToOtherDisPatchOrServer disPatchToOtherDisPatchOrServer){
         return receiveOtherDispatchService.linkServer(disPatchToOtherDisPatchOrServer);
     }

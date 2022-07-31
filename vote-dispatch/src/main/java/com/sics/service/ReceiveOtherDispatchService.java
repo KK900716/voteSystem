@@ -21,11 +21,11 @@ import java.util.Objects;
  */
 @Service
 public class ReceiveOtherDispatchService {
-    Logger logger = LoggerFactory.getLogger(ReceiveOtherDispatchService.class);
-    @Value("${url.sendToLinkServer}")
-    String sendToLinkServerUrl;
+    private final Logger logger = LoggerFactory.getLogger(ReceiveOtherDispatchService.class);
+    @Value("${url.sendToOtherDispatch}")
+    private String sendToLinkServerUrl;
     @Resource
-    RestTemplate restTemplate;
+    private RestTemplate restTemplate;
     public BasePojoImpl linkServer(DisPatchToOtherDisPatchOrServer disPatchToOtherDisPatchOrServer) {
         BasePojoImpl basePojo = new BasePojoImpl();
         if (disPatchToOtherDisPatchOrServer.getCode() == Code.SUCCESS.getCode()){
@@ -37,12 +37,17 @@ public class ReceiveOtherDispatchService {
                 basePojo.setMessage(Code.SUCCESS.getMessage());
                 return basePojo;
             }else {
-                logger.error("DisPatchToLinkServer error！");
+                try {
+                    throw new Exception("send to server result fail！");
+                } catch (Exception e) {
+                    logger.error("send to server result fail！");
+                    e.printStackTrace();
+                }
             }
         }
         basePojo.setCode(Code.FAIL.getCode());
         basePojo.setMessage(Code.FAIL.getMessage());
-        logger.error("DisPatchToDisPatch error！");
+        logger.error("dispatch receive fail");
         return basePojo;
     }
 }

@@ -5,4 +5,5 @@ server:
   port: 10002
 url:
   sendToServerGetIp: "http://127.0.0.1:9999/dispatch/get-ip-group"
-  sendToOtherDispatch: "http://TEMPLATE:10002/dispatch/get-ip-group"
+  sendToServerResult: "http://127.0.0.1:9999/dispatch/result"
+  sendToOtherDispatch: "http://TEMPLATE:10002/dispatch/cipher-or-password"

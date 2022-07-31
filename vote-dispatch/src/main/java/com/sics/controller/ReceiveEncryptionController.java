@@ -20,7 +20,7 @@ import javax.annotation.Resource;
 public class ReceiveEncryptionController {
     @Resource
     ReceiveEncryptionService receiveEncryptionService;
-    @PostMapping("/dispatch")
+    @PostMapping("/encryption/dispatch")
     public BasePojoImpl dispatch(@RequestBody EncryptionToDisPatchCiphertextAndPassword encryptionToDisPatchCiphertextAndPassword){
         return receiveEncryptionService.dispatch(encryptionToDisPatchCiphertextAndPassword);
     }

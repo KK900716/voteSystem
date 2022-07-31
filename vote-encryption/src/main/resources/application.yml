@@ -4,4 +4,4 @@ spring:
 server:
   port: 10001
 url:
-  sendToDispatch: "http://127.0.0.1:10002/dispatch"
+  sendToDispatch: "http://127.0.0.1:10002/encryption/dispatch"

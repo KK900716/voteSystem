@@ -51,11 +51,10 @@ public class ReceiveEncryptionService {
         returnBasePojo.setMessage(Code.FAIL.getMessage());
         returnBasePojo.setCode(Code.FAIL.getCode());
         try {
-            throw new Exception("encryptionToDisPatch error！");
+            throw new Exception("encryption to disPatch error！");
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("encryptionToDisPatch error！");
-            System.exit(-1);
+            logger.error("encryption to disPatch error！");
         }
         return returnBasePojo;
     }
@@ -77,8 +76,8 @@ public class ReceiveEncryptionService {
         } catch (RestClientException e) {
             e.printStackTrace();
             logger.error("DisPatchToLinkServer error！");
-            System.exit(-1);
         }
+        assert linkServerToDisPatchResponseEntity != null;
         if (Objects.requireNonNull(linkServerToDisPatchResponseEntity.getBody()).getCode() != Code.SUCCESS.getCode() ||
         linkServerToDisPatchResponseEntity.getBody().getData().size() < 2){
             logger.error("DisPatchToLinkServer error！");
@@ -120,7 +119,6 @@ public class ReceiveEncryptionService {
             } catch (HttpTimeoutException e) {
                 e.printStackTrace();
                 logger.error("send to other fail!");
-                System.exit(-1);
             }
         }
         // send second
@@ -143,10 +141,9 @@ public class ReceiveEncryptionService {
             } catch (HttpTimeoutException e) {
                 e.printStackTrace();
                 logger.error("send to other fail!");
-                System.exit(-1);
             }
         }
-        return true;
+        return size >= 0;
     }
     /**
      * random return ip group index

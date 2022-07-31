@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
@@ -26,7 +27,7 @@ import java.util.UUID;
  */
 @Service
 public class ReturnMessageService {
-    Logger logger = LoggerFactory.getLogger(ReturnMessageService.class);
+    private final Logger logger = LoggerFactory.getLogger(ReturnMessageService.class);
     /**
      * The URL sent to the Dispatch module
      */
@@ -60,7 +61,12 @@ public class ReturnMessageService {
         // Otherwise, return failure.
         returnBasePojo.setCode(Code.FAIL.getCode());
         returnBasePojo.setMessage(Code.FAIL.getMessage());
-        logger.error("webBackToEncryption error！");
+        try {
+            throw new Exception("webBack to encryption error！");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.warn("webBack to encryption error！");
+        }
         return returnBasePojo;
     }
     /**
@@ -86,9 +92,15 @@ public class ReturnMessageService {
         encryptionToDisPatchCiphertextAndPassword.setCode(Code.SUCCESS.getCode());
         encryptionToDisPatchCiphertextAndPassword.setMessage(Code.SUCCESS.getMessage());
         // send ciphertext and password dispatch
-        ResponseEntity<BasePojoImpl> basePojoResponseEntity =
-                restTemplate.postForEntity(url, encryptionToDisPatchCiphertextAndPassword, BasePojoImpl.class);
-        logger.info("send ciphertext and password dispatch");
-        return Objects.requireNonNull(basePojoResponseEntity.getBody()).getCode() == Code.SUCCESS.getCode();
+        ResponseEntity<BasePojoImpl> basePojoResponseEntity;
+        boolean result = false;
+        try {
+            basePojoResponseEntity = restTemplate.postForEntity(url, encryptionToDisPatchCiphertextAndPassword, BasePojoImpl.class);
+            result =  Objects.requireNonNull(basePojoResponseEntity.getBody()).getCode() == Code.SUCCESS.getCode();
+        } catch (RestClientException e) {
+            e.printStackTrace();
+            logger.warn("send ciphertext and password dispatch fail!");
+        }
+        return result;
     }
 }

@@ -18,7 +18,7 @@ import javax.annotation.Resource;
 public class ReceiveWebBackController {
     @Resource
     ReturnMessageService returnMessageService;
-    @PostMapping("/encode")
+    @PostMapping("/web-back/encode")
     public BasePojoImpl encode(@RequestBody WebBackToEncryption webBackToEncryption){
         return returnMessageService.encode(webBackToEncryption);
     }
