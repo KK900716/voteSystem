@@ -7,7 +7,6 @@
     <modules>
         <module>vote-dispatch</module>
         <module>vote-encryption</module>
-        <module>vote-linkServer</module>
         <module>vote-test</module>
         <module>vote-webBack</module>
         <module>vote-common</module>

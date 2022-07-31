@@ -2,7 +2,7 @@ package com.sics.service;
 
 import com.sics.constant.enums.Code;
 import com.sics.pojo.BasePojoImpl;
-import com.sics.pojo.DisPatchToOtherDisPatch;
+import com.sics.pojo.DisPatchToOtherDisPatchOrServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,12 +26,12 @@ public class ReceiveOtherDispatchService {
     String sendToLinkServerUrl;
     @Resource
     RestTemplate restTemplate;
-    public BasePojoImpl linkServer(DisPatchToOtherDisPatch disPatchToOtherDisPatch) {
+    public BasePojoImpl linkServer(DisPatchToOtherDisPatchOrServer disPatchToOtherDisPatchOrServer) {
         BasePojoImpl basePojo = new BasePojoImpl();
-        if (disPatchToOtherDisPatch.getCode() == Code.SUCCESS.getCode()){
+        if (disPatchToOtherDisPatchOrServer.getCode() == Code.SUCCESS.getCode()){
             // Send the ciphertext key to the linkServer
             ResponseEntity<BasePojoImpl> linkServerResponseEntity =
-                    restTemplate.postForEntity(sendToLinkServerUrl, disPatchToOtherDisPatch, BasePojoImpl.class);
+                    restTemplate.postForEntity(sendToLinkServerUrl, disPatchToOtherDisPatchOrServer, BasePojoImpl.class);
             if (Objects.requireNonNull(linkServerResponseEntity.getBody()).getCode() == Code.SUCCESS.getCode()){
                 basePojo.setCode(Code.SUCCESS.getCode());
                 basePojo.setMessage(Code.SUCCESS.getMessage());

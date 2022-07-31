@@ -1,7 +1,7 @@
 package com.sics.controller;
 
 import com.sics.pojo.BasePojoImpl;
-import com.sics.pojo.EncryptionToDisPatch;
+import com.sics.pojo.EncryptionToDisPatchCiphertextAndPassword;
 import com.sics.service.ReceiveEncryptionService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +21,7 @@ public class ReceiveEncryptionController {
     @Resource
     ReceiveEncryptionService receiveEncryptionService;
     @PostMapping("/dispatch")
-    public BasePojoImpl dispatch(@RequestBody EncryptionToDisPatch encryptionToDisPatch){
-        return receiveEncryptionService.dispatch(encryptionToDisPatch);
+    public BasePojoImpl dispatch(@RequestBody EncryptionToDisPatchCiphertextAndPassword encryptionToDisPatchCiphertextAndPassword){
+        return receiveEncryptionService.dispatch(encryptionToDisPatchCiphertextAndPassword);
     }
 }

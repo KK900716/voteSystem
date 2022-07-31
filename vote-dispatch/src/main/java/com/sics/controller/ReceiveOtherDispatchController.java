@@ -1,7 +1,7 @@
 package com.sics.controller;
 
 import com.sics.pojo.BasePojoImpl;
-import com.sics.pojo.DisPatchToOtherDisPatch;
+import com.sics.pojo.DisPatchToOtherDisPatchOrServer;
 import com.sics.service.ReceiveOtherDispatchService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +20,7 @@ public class ReceiveOtherDispatchController {
     @Resource
     ReceiveOtherDispatchService receiveOtherDispatchService;
     @PostMapping("link-server")
-    public BasePojoImpl linkServer(@RequestBody DisPatchToOtherDisPatch disPatchToOtherDisPatch){
-        return receiveOtherDispatchService.linkServer(disPatchToOtherDisPatch);
+    public BasePojoImpl linkServer(@RequestBody DisPatchToOtherDisPatchOrServer disPatchToOtherDisPatchOrServer){
+        return receiveOtherDispatchService.linkServer(disPatchToOtherDisPatchOrServer);
     }
 }

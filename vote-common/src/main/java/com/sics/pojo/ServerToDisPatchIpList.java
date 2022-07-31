@@ -8,5 +8,5 @@ import java.util.List;
  * @author liangjc
  * @version 2022/07/27
  */
-public class LinkServerToDisPatch extends BasePojo<List<String>>{
+public class ServerToDisPatchIpList extends BasePojo<List<String>>{
 }

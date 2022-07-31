@@ -8,9 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import java.net.http.HttpTimeoutException;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,86 +24,162 @@ import java.util.Objects;
  */
 @Service
 public class ReceiveEncryptionService {
-    Logger logger = LoggerFactory.getLogger(ReceiveEncryptionService.class);
-    @Value("${url.sendToLinkServer}")
-    String sendToLinkServerUrl;
-    @Value("${server.port}")
-    String dispatchPort;
+    private final Logger logger = LoggerFactory.getLogger(ReceiveEncryptionService.class);
+    @Value("${url.sendToServerGetIp}")
+    private String sendToServerUrl;
+    @Value("TEMPLATE")
+    private String hostTemplate;
+    @Value("${server.sendToOtherDispatch}")
+    private String sendOtherDispatchUrl;
     @Resource
-    RestTemplate restTemplate;
+    private RestTemplate restTemplate;
     /**
      * Implementing distribution logic
      * @author liangjc
-     * @param encryptionToDisPatch Forms that accept encryption from Encryption
+     * @param encryptionToDisPatchCiphertextAndPassword Forms that accept encryption from Encryption
      * @return Return accepted status
      */
-    public BasePojoImpl dispatch(EncryptionToDisPatch encryptionToDisPatch) {
+    public BasePojoImpl dispatch(EncryptionToDisPatchCiphertextAndPassword encryptionToDisPatchCiphertextAndPassword) {
         // new return message
         BasePojoImpl returnBasePojo = new BasePojoImpl();
         // Determine whether acceptance is successful, Processing distribution
-        if (encryptionToDisPatch.getCode() == Code.SUCCESS.getCode() || sendOtherDispatch(encryptionToDisPatch)){
+        if (encryptionToDisPatchCiphertextAndPassword.getCode() == Code.SUCCESS.getCode() || buildingTheEntity(encryptionToDisPatchCiphertextAndPassword)){
             returnBasePojo.setCode(Code.SUCCESS.getCode());
             returnBasePojo.setMessage(Code.SUCCESS.getMessage());
             return returnBasePojo;
         }
         returnBasePojo.setMessage(Code.FAIL.getMessage());
         returnBasePojo.setCode(Code.FAIL.getCode());
-        logger.error("encryptionToDisPatch error！");
+        try {
+            throw new Exception("encryptionToDisPatch error！");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("encryptionToDisPatch error！");
+            System.exit(-1);
+        }
         return returnBasePojo;
     }
     /**
      * Processing distribution
      * @author liangjc
-     * @param encryptionToDisPatch password and ciphertext
+     * @param encryptionToDisPatchCiphertextAndPassword password and ciphertext
      * @return whether success
      */
-    private boolean sendOtherDispatch(EncryptionToDisPatch encryptionToDisPatch) {
+    private boolean buildingTheEntity(EncryptionToDisPatchCiphertextAndPassword encryptionToDisPatchCiphertextAndPassword) {
         BasePojoImpl basePojo = new BasePojoImpl();
         basePojo.setCode(Code.SUCCESS.getCode());
         basePojo.setMessage(Code.SUCCESS.getMessage());
         // Request a voting user from the server
-        ResponseEntity<LinkServerToDisPatch> linkServerToDisPatchResponseEntity =
-                restTemplate.postForEntity(sendToLinkServerUrl, basePojo, LinkServerToDisPatch.class);
-        if (Objects.requireNonNull(linkServerToDisPatchResponseEntity.getBody()).getCode() != Code.SUCCESS.getCode()){
+        ResponseEntity<ServerToDisPatchIpList> linkServerToDisPatchResponseEntity =
+                null;
+        try {
+            linkServerToDisPatchResponseEntity = restTemplate.postForEntity(sendToServerUrl, basePojo, ServerToDisPatchIpList.class);
+        } catch (RestClientException e) {
+            e.printStackTrace();
+            logger.error("DisPatchToLinkServer error！");
+            System.exit(-1);
+        }
+        if (Objects.requireNonNull(linkServerToDisPatchResponseEntity.getBody()).getCode() != Code.SUCCESS.getCode() ||
+        linkServerToDisPatchResponseEntity.getBody().getData().size() < 2){
             logger.error("DisPatchToLinkServer error！");
             return false;
         }
-        // Get the ids of all users
-        List<String> userUrlMap = linkServerToDisPatchResponseEntity.getBody().getData();
-        // Distribute to random IP addresses
-        int firstDispatchIp = (int)(Math.random() * userUrlMap.size());
-        int secondDispatchIp = (int)(Math.random() * userUrlMap.size());
-        while (firstDispatchIp == secondDispatchIp){
-            secondDispatchIp = (int)(Math.random() * userUrlMap.size());
-        }
-        // dispatch
         // Building the Entity class
-        CiphertextOrPassword firstCiphertextOrPassword = new CiphertextOrPassword();
-        CiphertextOrPassword secondCiphertextOrPassword = new CiphertextOrPassword();
-        firstCiphertextOrPassword.setType(CiphertextOrPasswordType.CIPHERTEXT);
-        firstCiphertextOrPassword.setValue(encryptionToDisPatch.getData().getCiphertext());
-        DisPatchToOtherDisPatch firstDisPatchToOtherDisPatch = new DisPatchToOtherDisPatch();
-        firstDisPatchToOtherDisPatch.setCode(Code.SUCCESS.getCode());
-        firstDisPatchToOtherDisPatch.setMessage(Code.SUCCESS.getMessage());
-        firstDisPatchToOtherDisPatch.setData(firstCiphertextOrPassword);
-        secondCiphertextOrPassword.setType(CiphertextOrPasswordType.PASSWORD);
-        secondCiphertextOrPassword.setValue(encryptionToDisPatch.getData().getPassword());
-        DisPatchToOtherDisPatch secondDisPatchToOtherDisPatch = new DisPatchToOtherDisPatch();
-        firstDisPatchToOtherDisPatch.setCode(Code.SUCCESS.getCode());
-        firstDisPatchToOtherDisPatch.setMessage(Code.SUCCESS.getMessage());
-        firstDisPatchToOtherDisPatch.setData(secondCiphertextOrPassword);
+        CipherTextOrPassword firstCipherTextOrPassword = new CipherTextOrPassword(CiphertextOrPasswordType.CIPHERTEXT, encryptionToDisPatchCiphertextAndPassword.getData().getCiphertext());
+        CipherTextOrPassword secondCipherTextOrPassword = new CipherTextOrPassword(CiphertextOrPasswordType.PASSWORD, encryptionToDisPatchCiphertextAndPassword.getData().getPassword());
+        DisPatchToOtherDisPatchOrServer firstDisPatchToOtherDisPatchOrServer = new DisPatchToOtherDisPatchOrServer();
+        firstDisPatchToOtherDisPatchOrServer.setCode(Code.SUCCESS.getCode());
+        firstDisPatchToOtherDisPatchOrServer.setMessage(Code.SUCCESS.getMessage());
+        firstDisPatchToOtherDisPatchOrServer.setData(firstCipherTextOrPassword);
+        DisPatchToOtherDisPatchOrServer secondDisPatchToOtherDisPatchOrServer = new DisPatchToOtherDisPatchOrServer();
+        secondDisPatchToOtherDisPatchOrServer.setCode(Code.SUCCESS.getCode());
+        secondDisPatchToOtherDisPatchOrServer.setMessage(Code.SUCCESS.getMessage());
+        secondDisPatchToOtherDisPatchOrServer.setData(secondCipherTextOrPassword);
+        // Get the ids of all users
+        List<String> userUrlList = linkServerToDisPatchResponseEntity.getBody().getData();
         // Send to other dispatches
-        ResponseEntity<BasePojoImpl> firstDisPatchResponse = restTemplate.postForEntity(
-                "http://" + userUrlMap.get(firstDispatchIp)+ dispatchPort + "/link-server",
-                firstDisPatchToOtherDisPatch, BasePojoImpl.class);
-        ResponseEntity<BasePojoImpl> secondDisPatchResponse = restTemplate.postForEntity(
-                "http://" + userUrlMap.get(firstDispatchIp)+ dispatchPort + "/link-server",
-                secondDisPatchToOtherDisPatch, BasePojoImpl.class);
-        boolean whetherSuccess =  Objects.requireNonNull(firstDisPatchResponse.getBody()).getCode() == Code.SUCCESS.getCode() &&
-                Objects.requireNonNull(secondDisPatchResponse.getBody()).getCode() == Code.SUCCESS.getCode();
-        if (!whetherSuccess){
-            logger.error("DisPatchToDisPatch error！");
+        boolean[] ipWhetherIsUsed = new boolean[userUrlList.size()];
+        int size = ipWhetherIsUsed.length;
+        int firstDispatchIp = randomIpIndex(ipWhetherIsUsed, userUrlList.size());
+        size--;
+        // Send first
+        boolean sendWhetherSuccess = false;
+        while (size > 0){
+            sendWhetherSuccess = sendToOtherDisPatch(sendOtherDispatchUrl.replace(hostTemplate, userUrlList.get(firstDispatchIp))
+                    , firstDisPatchToOtherDisPatchOrServer);
+            if (sendWhetherSuccess){
+                break;
+            }
+            firstDispatchIp = randomIpIndex(ipWhetherIsUsed, userUrlList.size());
+            size--;
         }
-        return whetherSuccess;
+        if (!sendWhetherSuccess) {
+            logger.error("send to other fail!");
+            try {
+                throw new HttpTimeoutException("send to other fail!");
+            } catch (HttpTimeoutException e) {
+                e.printStackTrace();
+                logger.error("send to other fail!");
+                System.exit(-1);
+            }
+        }
+        // send second
+        sendWhetherSuccess = false;
+        int secondDispatchIp = randomIpIndex(ipWhetherIsUsed, userUrlList.size());
+        size--;
+        while (size >= 0){
+            sendWhetherSuccess = sendToOtherDisPatch(sendOtherDispatchUrl.replace(hostTemplate, userUrlList.get(secondDispatchIp))
+                    , secondDisPatchToOtherDisPatchOrServer);
+            if (sendWhetherSuccess){
+                break;
+            }
+            secondDispatchIp = randomIpIndex(ipWhetherIsUsed, userUrlList.size());
+            size--;
+        }
+        if (!sendWhetherSuccess) {
+            logger.error("send to other fail!");
+            try {
+                throw new HttpTimeoutException("send to other fail!");
+            } catch (HttpTimeoutException e) {
+                e.printStackTrace();
+                logger.error("send to other fail!");
+                System.exit(-1);
+            }
+        }
+        return true;
+    }
+    /**
+     * random return ip group index
+     * @param ipWhetherIsUsed judge usage
+     * @param size random range
+     * @return index
+     */
+    private int randomIpIndex(boolean[] ipWhetherIsUsed, int size) {
+        while (true) {
+            int result = (int) (Math.random() * size);
+            if (!ipWhetherIsUsed[result]) {
+                ipWhetherIsUsed[result] = true;
+                return result;
+            }
+        }
+    }
+    /**
+     * send module
+     * @param url Send the url of the
+     * @param disPatchToOtherDisPatch entity
+     * @return whether success
+     */
+    private boolean sendToOtherDisPatch(String url, DisPatchToOtherDisPatchOrServer disPatchToOtherDisPatch){
+        try {
+            ResponseEntity<BasePojoImpl> disPatchResponse = restTemplate.postForEntity(url, disPatchToOtherDisPatch, BasePojoImpl.class);
+            if (Objects.requireNonNull(disPatchResponse.getBody()).getCode() != Code.SUCCESS.getCode()){
+                throw new Exception("send to other dispatch fail!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.warn(url + "connection timeout!");
+            return false;
+        }
+        return true;
     }
 }

@@ -5,6 +5,6 @@ package com.sics.pojo;
  * @author liangjc
  * @version 2022/07/26
  */
-public class EncryptionToDisPatch extends BasePojo<CiphertextAndPassword>{
+public class EncryptionToDisPatchCiphertextAndPassword extends BasePojo<CiphertextAndPassword>{
 
 }

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CiphertextOrPassword {
+public class CipherTextOrPassword {
     private CiphertextOrPasswordType type;
     private String value;
 }

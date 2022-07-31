@@ -5,7 +5,7 @@ import com.sics.constant.enums.Code;
 import com.sics.encryption.aes.EncryptionAesImpl;
 import com.sics.pojo.BasePojoImpl;
 import com.sics.pojo.CiphertextAndPassword;
-import com.sics.pojo.EncryptionToDisPatch;
+import com.sics.pojo.EncryptionToDisPatchCiphertextAndPassword;
 import com.sics.pojo.WebBackToEncryption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,15 +79,15 @@ public class ReturnMessageService {
         logger.info("uses the AES encryption algorithm");
         // Encapsulating an entity class
         CiphertextAndPassword ciphertextAndPassword = new CiphertextAndPassword();
-        EncryptionToDisPatch encryptionToDisPatch = new EncryptionToDisPatch();
+        EncryptionToDisPatchCiphertextAndPassword encryptionToDisPatchCiphertextAndPassword = new EncryptionToDisPatchCiphertextAndPassword();
         ciphertextAndPassword.setPassword(password);
         ciphertextAndPassword.setCiphertext(ciphertext);
-        encryptionToDisPatch.setData(ciphertextAndPassword);
-        encryptionToDisPatch.setCode(Code.SUCCESS.getCode());
-        encryptionToDisPatch.setMessage(Code.SUCCESS.getMessage());
+        encryptionToDisPatchCiphertextAndPassword.setData(ciphertextAndPassword);
+        encryptionToDisPatchCiphertextAndPassword.setCode(Code.SUCCESS.getCode());
+        encryptionToDisPatchCiphertextAndPassword.setMessage(Code.SUCCESS.getMessage());
         // send ciphertext and password dispatch
         ResponseEntity<BasePojoImpl> basePojoResponseEntity =
-                restTemplate.postForEntity(url, encryptionToDisPatch, BasePojoImpl.class);
+                restTemplate.postForEntity(url, encryptionToDisPatchCiphertextAndPassword, BasePojoImpl.class);
         logger.info("send ciphertext and password dispatch");
         return Objects.requireNonNull(basePojoResponseEntity.getBody()).getCode() == Code.SUCCESS.getCode();
     }
