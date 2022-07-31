@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: vote-webBack10005
+server:
+  port: 10005
+url:
+  sendToEncrytion: "http://127.0.0.1:10001/encode"
+  receiveServer:
