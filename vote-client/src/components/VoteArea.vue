@@ -53,14 +53,16 @@
 </template>
 
 <script>
-    // import axios from "axios";
-    import axios from "axios";
+// import axios from "axios";
+import axios from "axios";
 
-    export default {
+export default {
         name: "VoteArea",
         data() {
             return{
-                voteNames:[],
+                voteNames:[{
+                  name:"zhangsan"
+                }],
                 name:'',
                 num:1,
                 activeIndex: '1',
@@ -109,12 +111,13 @@
                 ).then(
                     (res)=> {
                         this.voteNames=res.data
-                        if(res.data == true){
-                            console.log(res.data())
-                        }
-                        else {
-                            alert("投票失败");
-                        }
+
+                        console.log(res.data)
+                        // if(res.data == true){
+                        //     console.log(res.data())
+                        // }
+                        // else {
+                        // }
 
                     }
                 )

@@ -8,9 +8,10 @@ package com.sics.constant.enums;
  */
 public enum Code {
     // success
-    SUCCESS(200,"success"),
+    SUCCESS(200,"success!"),
+    REPEAT(201,"You have voted!"),
     // fail
-    FAIL(400,"fail");
+    FAIL(400,"fail!");
 
     public int getCode() {
         return code;

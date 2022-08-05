@@ -2,7 +2,15 @@ package com.sics.service;
 
 import com.sics.constant.enums.CiphertextOrPasswordType;
 import com.sics.constant.enums.Code;
-import com.sics.pojo.*;
+import com.sics.pojo.BasePojoImpl;
+import com.sics.pojo.CipherTextOrPassword;
+import com.sics.pojo.DisPatchToOtherDisPatchOrServer;
+import com.sics.pojo.EncryptionToDisPatchCiphertextAndPassword;
+import com.sics.pojo.ServerToDisPatchIpList;
+import java.net.http.HttpTimeoutException;
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,11 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
-import javax.annotation.Resource;
-import java.net.http.HttpTimeoutException;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Handle distribution services and implement algorithmic logic
@@ -43,7 +46,7 @@ public class ReceiveEncryptionService {
         // new return message
         BasePojoImpl returnBasePojo = new BasePojoImpl();
         // Determine whether acceptance is successful, Processing distribution
-        if (encryptionToDisPatchCiphertextAndPassword.getCode() == Code.SUCCESS.getCode() || buildingTheEntity(encryptionToDisPatchCiphertextAndPassword)){
+        if (encryptionToDisPatchCiphertextAndPassword.getCode() == Code.SUCCESS.getCode() && buildingTheEntity(encryptionToDisPatchCiphertextAndPassword)){
             returnBasePojo.setCode(Code.SUCCESS.getCode());
             returnBasePojo.setMessage(Code.SUCCESS.getMessage());
             return returnBasePojo;
@@ -73,15 +76,14 @@ public class ReceiveEncryptionService {
                 null;
         try {
             linkServerToDisPatchResponseEntity = restTemplate.postForEntity(sendToServerUrl, basePojo, ServerToDisPatchIpList.class);
+            if (Objects.requireNonNull(linkServerToDisPatchResponseEntity.getBody()).getCode() != Code.SUCCESS.getCode() ||
+                linkServerToDisPatchResponseEntity.getBody().getData().size() < 2){
+                logger.error("DisPatchToLinkServer error！");
+                return false;
+            }
         } catch (RestClientException e) {
             e.printStackTrace();
             logger.error("DisPatchToLinkServer error！");
-        }
-        assert linkServerToDisPatchResponseEntity != null;
-        if (Objects.requireNonNull(linkServerToDisPatchResponseEntity.getBody()).getCode() != Code.SUCCESS.getCode() ||
-        linkServerToDisPatchResponseEntity.getBody().getData().size() < 2){
-            logger.error("DisPatchToLinkServer error！");
-            return false;
         }
         // Building the Entity class
         CipherTextOrPassword firstCipherTextOrPassword = new CipherTextOrPassword(CiphertextOrPasswordType.CIPHERTEXT, encryptionToDisPatchCiphertextAndPassword.getData().getCiphertext());
