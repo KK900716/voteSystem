@@ -1,12 +1,10 @@
 package com.sics.controller;
 
-import com.sics.pojo.WebBackToEncryption;
+import com.sics.pojo.VoteMessage;
 import com.sics.service.GetVoteNamesService;
-import com.sics.service.SendToEncryptionService;
+import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
 
 /**
  * @Author Tlinian
@@ -19,8 +17,7 @@ public class GetVoteNamesController {
     GetVoteNamesService getVoteNamesService;
     //reture type
     @GetMapping("/getVoteNames")
-    public void  getVotePojo(WebBackToEncryption webBackToEncryption){
-//        return null;
-        getVoteNamesService.getVoteNames();
+    public VoteMessage getVotePojo(){
+        return getVoteNamesService.getVoteNames();
     }
 }

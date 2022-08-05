@@ -5,7 +5,8 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import axios from 'axios'
 import qs from 'qs'
-axios.defaults.baseURL = 'http://localhost:8888'
+
+axios.defaults.baseURL = 'http://localhost:10005'
 Vue.config.productionTip = false
 Vue.prototype.$qs = qs
 Vue.use(ElementUI);

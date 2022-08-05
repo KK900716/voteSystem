@@ -5,4 +5,4 @@ server:
   port: 10005
 url:
   sendToEncrytion: "http://127.0.0.1:10001/web-back/encode"
-  receiveServer:
+  receiveServer: "http://127.0.0.1:9999/server/vote"
