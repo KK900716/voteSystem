@@ -13,9 +13,10 @@
                         text-color="#fff"
 
                         active-text-color="#ffd04b">
-                    <el-menu-item index="1"  @click="toVoteArea">投票</el-menu-item>
+                    <el-menu-item index="1" @click="toVoteArea">投票</el-menu-item>
 
                     <el-menu-item index="2"  @click="toVoteResultDisplay">查看结果</el-menu-item>
+                  <el-menu-item  @click="reflesh">刷新</el-menu-item>
                 </el-menu>
                 <el-divider></el-divider>
             </div>
@@ -56,6 +57,9 @@
             },
             handleSelect(key, keyPath) {
                 console.log(key, keyPath);
+            },
+            reflesh(){
+              location.reload()
             }
         }
     }

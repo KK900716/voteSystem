@@ -35,8 +35,7 @@
         },
         methods:{
             getVoteResult(){
-                axios.get(`/getVoteMessage`
-
+                axios.post(`/voteResult`
                 ).then(
                     (res)=> {
                         this.voteResult = res.data

@@ -1,6 +1,23 @@
 <template>
     <el-container class="vote-area" >
+      <template>
+        <el-dialog
+            title="投票"
+            :visible.sync="voteDialogVisable"
+            width="30%"
+            destroy-on-close
+            @close="handleClose()">
+          <template>
+            <div>{{this.name}}</div>
+            <el-input-number  v-model="num" @change="handleChange" :min="1" :max="10" label="投票分数"></el-input-number>
+          </template>
+          <span slot="footer" class="dialog-footer">
+                        <el-button @click="voteDialogVisable = false">取 消</el-button>
+                        <el-button type="primary" @click="sendToWebBack">确 定</el-button>
+                    </span>
+        </el-dialog>
 
+      </template>
         <el-table
                 :data="voteNames"
                 stripe
@@ -12,42 +29,20 @@
                     label="姓名"
                     width="400">
             </el-table-column>
-<!--            <el-table-column-->
-<!--                    prop="score"-->
-<!--                    label="投票记录"-->
-<!--                    width="200"-->
-<!--            >-->
-<!--            </el-table-column>-->
+
             <el-table-column
                     class="el-table-demo-item"
 
                     label="投票"
                     width="400"
-                    prop="score"
 
             >
                 <template slot-scope="scope" >
                     <el-button type="success"  @click="voteDialog(scope.row.name)">投票</el-button>
                 </template>
-
             </el-table-column>
         </el-table>
-<template>
-    <el-dialog
-            title="提示"
-            :visible.sync="voteDialogVisable"
-            slot-scope="scope"
-            width="30%"
-            :before-close="handleClose(scope.row)">
-        <template>
-            <el-input-number v-model="num" @change="handleChange" :min="1" :max="10" label="描述文字"></el-input-number>
-        </template>
-        <span slot="footer" class="dialog-footer">
-                        <el-button @click="voteDialogVisable = false">取 消</el-button>
-                        <el-button type="primary" @click="voteDialogVisable = false">确 定</el-button>
-                    </span>
-    </el-dialog>
-</template>
+
     </el-container>
 
 </template>
@@ -77,16 +72,23 @@ export default {
 
             sendToWebBack(){
                 let url_data = this.$qs.stringify({
-                    voteName:this.name,
+                    name:this.name,
                     score:this.num
                 })
                 axios.post(`/voteMessage`,
                     url_data
-
                 ).then(
                     (res)=> {
+                      //   console.log(res.data.valueOf())
+                      // let isTrue = .valueOf()
                         if(res.data == true){
-                            console.log(res.data())
+                            console.log(res.data)
+                            this.voteDialogVisable=false
+                            this.$message({
+                              message: '投票成功！',
+                              type: 'success'
+                            });
+                            this.getVoteName()
                         }
                         else {
                             alert("投票失败");
@@ -96,6 +98,7 @@ export default {
                 )
             },
             voteDialog(value){
+              console.log("点击了："+value)
                 this.name=value
                 this.voteDialogVisable=true
             },
@@ -103,7 +106,7 @@ export default {
                 this.voteDialogVisable=false
             },
             handleChange(){
-                this.sendToWebBack()
+                // this.sendToWebBack()
             },
             getVoteName(){
                 axios.get(`/getVoteNames`

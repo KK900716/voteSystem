@@ -1,11 +1,15 @@
 package com.sics.controller;
 
+import com.sics.constant.enums.Code;
+import com.sics.params.VoteParam;
 import com.sics.pojo.WebBackToEncryption;
 import com.sics.service.SendToEncryptionService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author Tlinian
@@ -13,12 +17,14 @@ import javax.annotation.Resource;
  * @Date 2022/7/30
  */
 @RestController
+@CrossOrigin
 public class SendEncryptionController {
     @Resource
     SendToEncryptionService sendToEncryptionService;
 
-    @GetMapping("/voteMessage")
-    public boolean  getVotePojo(WebBackToEncryption webBackToEncryption){
-        return sendToEncryptionService.sendEncrytion(webBackToEncryption);
+    @PostMapping("/voteMessage")
+    public boolean  getVotePojo(VoteParam voteParam){
+        System.out.println(new Date()+"/voteMessage"+voteParam.toString());
+        return sendToEncryptionService.sendEncrytion(voteParam);
     }
 }

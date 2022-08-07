@@ -1,9 +1,9 @@
 package com.sics.service;
 
 import com.sics.constant.enums.Code;
-import com.sics.params.VoteName;
+import com.sics.params.VoteParam;
 import com.sics.pojo.BasePojoImpl;
-import com.sics.pojo.VoteMessage;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Resource;
@@ -25,15 +25,17 @@ public class GetVoteNamesService {
     @Resource
     private RestTemplate restTemplate;
     //Variable return parameters will be refined in due course
-    public List<VoteName> getVoteNames(){
-        ResponseEntity<VoteMessage> voteMessageResponseEntity =
-            restTemplate.postForEntity(url, new BasePojoImpl(), VoteMessage.class);
-        VoteMessage voteMessage = voteMessageResponseEntity.getBody();
+    public List<VoteParam> getVoteNames(){
+        ResponseEntity<com.sics.pojo.VoteMessage> voteMessageResponseEntity =
+            restTemplate.postForEntity(url, new BasePojoImpl(), com.sics.pojo.VoteMessage.class);
+        com.sics.pojo.VoteMessage voteMessage = voteMessageResponseEntity.getBody();
 
-        List<VoteName> voteNameList = new ArrayList<>();
+        List<VoteParam> voteNameList = new ArrayList<>();
         for (int i = 0; i < voteMessage.getData().size(); i++) {
             if (voteMessage.getCode() == Code.SUCCESS.getCode()){
-                voteNameList.add(new VoteName(voteMessage.getData().get(i)));
+                VoteParam voteParam= new VoteParam();
+                voteParam.setName(voteMessage.getData().get(i));
+                voteNameList.add(voteParam);
             }
         }
         System.out.println(voteMessage);

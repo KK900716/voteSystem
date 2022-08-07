@@ -1,6 +1,6 @@
 package com.sics.controller;
 
-import com.sics.params.VoteName;
+import com.sics.params.VoteParam;
 import com.sics.service.GetVoteNamesService;
 import java.util.List;
 import javax.annotation.Resource;
@@ -20,7 +20,7 @@ public class GetVoteNamesController {
     GetVoteNamesService getVoteNamesService;
     //reture type
     @GetMapping("/getVoteNames")
-    public List<VoteName> getVotePojo(){
+    public List<VoteParam> getVotePojo(){
         return getVoteNamesService.getVoteNames();
     }
 }
